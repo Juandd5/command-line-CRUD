@@ -1,0 +1,4 @@
+ 
+        [console_scripts]
+        customer_management=customer_management:cli
+    
