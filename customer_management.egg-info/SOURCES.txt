@@ -1,8 +1,0 @@
-customer_management.py
-setup.py
-customer_management.egg-info/PKG-INFO
-customer_management.egg-info/SOURCES.txt
-customer_management.egg-info/dependency_links.txt
-customer_management.egg-info/entry_points.txt
-customer_management.egg-info/requires.txt
-customer_management.egg-info/top_level.txt

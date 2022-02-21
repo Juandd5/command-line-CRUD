@@ -1,4 +1,0 @@
- 
-        [console_scripts]
-        cm=customer_management:cli
-    
