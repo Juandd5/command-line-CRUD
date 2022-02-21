@@ -1,3 +1,4 @@
+from itertools import count
 import click
 from clients.models import Client
 from clients.services import ClientServices
@@ -53,17 +54,63 @@ def list(ctx):
 
 
 @clients.command()
+@click.argument('client_id', type=str) #pido el id como argumento
 @click.pass_context
 def update(ctx, client_id):
     """Updates a client"""
-    pass
+    client_service = ClientServices(ctx.obj['clients_table'])
+
+    client_list = client_service.list_clients() #nos traemos la lista de clientes
+
+    client = [client for client in client_list if client['id'] == client_id]
+    #en client solo se almacena un diccionario si coincide con el id del cliente
+    if client:
+        client = _update_client_flow(Client(**client[0]))#pasamos un objeto tipo Client y le damos los valores
+        #que tiene tiene el único diccionario de la lista client
+        client_service.update_client(client)
+
+        click.echo('Client is updated')
+    else:
+        click.echo('Client not found')
+
+
+def _update_client_flow(client):
+    """Updates client data as desired by the user
+    Args:
+        client (Client): it is an object from Client class
+    returns:
+        Client: an update object from Client class
+    """
+    click.echo('Leave the field empty if you do not want to modify it/n')
+    #pediremos las datos del nuevo cliente, el usuario puede cambiarlos todos o los que desee
+    #en caso de que solo quiera cambiar un campo, los demás quedan como estaban
+    client.name = click.prompt('New name', type=str, default=client.name)
+    client.company = click.prompt('New company', type=str, default=client.company)
+    client.email = click.prompt('New email', type=str, default=client.email)
+    client.position = click.prompt('New position', type=str, default=client.position)
+
+    return client
 
 
 @clients.command()
+@click.argument('client_id', type=str)
 @click.pass_context
 def delete(ctx, client_id):
     """Deletes a client"""
-    pass
+    client_service = ClientServices(ctx.obj['clients_table'])
+    clients_list = client_service.list_clients()
+    client_in_list = False
+
+    for idx, client in enumerate(clients_list):
+        if client['id'] == client_id:
+            del clients_list[idx]
+            client_in_list = True
+            break
+    
+    click.echo(f'Client {"deleted" if client_in_list else "not found"}')
+    
+    client_service._save_to_disk(clients_list)
+
 
 #genero un alias de clients
 all = clients
